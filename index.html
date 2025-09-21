@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuestionario de Ética y Gestión</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .option-label.disabled {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body class="bg-gray-800 text-gray-200">
+
+    <div class="container mx-auto p-4 sm:p-6 md:p-8 max-w-4xl">
+        <header class="bg-gray-700 shadow-md rounded-lg p-6 mb-6">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-teal-400">Cuestionario de Ética y Gestión de Enfermería</h1>
+        </header>
+
+        <!-- Scoreboard -->
+        <div class="bg-gray-700 shadow-md rounded-lg p-4 mb-6 flex justify-around text-center">
+            <div>
+                <p class="text-sm text-gray-400">ACIERTOS</p>
+                <p id="correct-score" class="text-2xl font-bold text-green-400">0</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-400">ERRORES</p>
+                <p id="incorrect-score" class="text-2xl font-bold text-red-400">0</p>
+            </div>
+        </div>
+
+        <main id="quiz-container">
+            <!-- La pregunta actual se insertará aquí -->
+        </main>
+        
+        <footer class="mt-8 text-center">
+            <button id="next-btn" class="hidden bg-teal-500 hover:bg-teal-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition-transform transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-teal-400">
+                Siguiente Pregunta
+            </button>
+            <button id="restart-btn" class="hidden bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition-transform transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-400">
+                Reiniciar Test
+            </button>
+        </footer>
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                question: "1. Señale cual de estas propuestas respecto a la administración es falsa:",
+                options: { a: "Ha pasado por varias etapas a lo largo de su historia", b: "Es una actividad sistemática", c: "Plena finalidad en sí misma", d: "Trata de conseguir resultados de forma eficaz y eficiente." },
+                answer: "c"
+            },
+            {
+                question: "2. El desarrollo de la administración como ciencia ha estado relacionado con:",
+                options: { a: "La implantación de sistemas productivos complejos.", b: "El desarrollo del movimiento de asociacionismo obrero.", c: "La aplicación al mundo del trabajo de las ciencias afines, como la psicología y la sociología.", d: "Todo lo anterior es verdadero." },
+                answer: "d"
+            },
+            {
+                question: "3. En un sistema sanitario, la productividad:",
+                options: { a: "No se puede medir, ya que la salud es un concepto muy complejo", b: "Significa conseguir el mayor incremento de los servicios disponibles.", c: "Es la consecución de un mayor número de acciones en salud.", d: "Pretende la disminución significativa de las situaciones de riesgo." },
+                answer: "b"
+            },
+            {
+                question: "4. Un sistema público de salud:",
+                options: { a: "Se basa en prácticas asistenciales que priman la atención curativa.", b: "Propicia la libre elección por parte del usuario de médico y otros servicios sanitarios.", c: "Es aquel en el que predomina el sistema de pago de acuerdo a los servicios recibidos.", d: "Se financia fundamentalmente a través de los presupuestos generales del estado y seguros públicos." },
+                answer: "d"
+            },
+            {
+                question: "5. El sistema nacional de salud:",
+                options: { a: "Es la integración de todas las funciones y prestaciones que son responsabilidad de los poderes públicos.", b: "Es la forma de organizar los recursos asistenciales integrando la totalidad de éstos.", c: "Depende fundamentalmente del INSAUD", d: "Tiene como finalidad el abaratamiento de los costes." },
+                answer: "a"
+            },
+            {
+                question: "6. ¿Qué significa el concepto de equidad?",
+                options: { a: "La distribución igualitaria de los recursos existentes en la atención", b: "La no discriminación por razón de edad, sexo, religión...", c: "El reconocimiento legal presente en la Constitución.", d: "La necesidad de conseguir similares niveles de salud en toda la población cualquiera que sea su situación." },
+                answer: "d"
+            },
+            {
+                question: "7. El servicio regional de salud:",
+                options: { a: "Integra aquellos servicios regionales de salud de comunidades con competencias en atención sanitaria.", b: "Se rige por el consejo interterritorial de salud.", c: "coordina solamente los recursos asistenciales públicos.", d: "Tiene como finalidad que todos los organismos sanitarios tengan financiación de forma igualitaria." },
+                answer: "b"
+            },
+            {
+                question: "8. La finalidad del proceso administrativo se puede cifrar en:",
+                options: { a: "Servir de base para el estudio de una serie de actividades, actuando conjuntamente.", b: "Constituir una explicación de la forma de actuar científicamente en una actuación concreta.", c: "Ser guía de actuación para la aplicación de los principios de la administración en cada actuación.", d: "Orientar la forma de actuar en función de la eficacia, la eficiencia y la productividad." },
+                answer: "d"
+            },
+            {
+                question: "9. Al afirmar que el proceso administrativo tiene características de dinamismo se quiere significa:",
+                options: { a: "Que todas sus etapas actúan conjuntamente.", b: "Que tiene la posibilidad de mejorar continuamente, reorientando la acción a medida que se producen los resultados.", c: "Que el proceso se mantiene en constante progreso, en el que cada fase da inicio a la siguiente.", d: "Que la acción de varios grupos coordinados entre sí permiten una movilidad e intercambio de intereses mutuos." },
+                answer: "b"
+            },
+            {
+                question: "10. La importancia de la información en la administración de servicios de salud está en relación fundamentalmente con:",
+                options: { a: "La posibilidad de disponer de fuentes directas.", b: "La cantidad de datos a que se tenga acceso.", c: "La estructuración de los datos. Esto es que pertenezcan a un sistema totalmente organizado.", d: "Las condiciones de su manejo y utilización, es decir, la posibilidad de utilizar realmente los datos." },
+                answer: "d"
+            },
+            {
+                question: "11. En un programa los objetivos:",
+                options: { a: "Convienen que sean tan numerosos como para que abarquen todas las actividades a realizar", b: "Se formulan por el responsable del equipo, ya que por lo general las opiniones de los trabajadores lo hacen más inespecífico", c: "debe incluir varios aspectos en un mismo objetivo", d: "Han de estar formulados con condiciones de cumplimiento y medida." },
+                answer: "d"
+            },
+            {
+                question: "12. Un programa de salud:",
+                options: { a: "Es aquel que se dirige a la atención de problemas sencillos, de facil abordaje", b: "Es el problema principal, del que se derivan los demás.", c: "Integra acciones de atención directa (personas y medio) administrativas y docentes asistenciales.", d: "Es una actividad que se puede llevar a cabo por un equipo reducido, por ejemplo medico-enfermera, enfermera-auxiliar." },
+                answer: "c"
+            },
+            {
+                question: "13. En una institución de salud los presupuestos:",
+                options: { a: "Vienen financiados cada año por una entidad financiadora, por ejemplo el ministerio de sanidad.", b: "Tienen diferentes finalidades, según sea la institución pública o privada.", c: "Por la rapidez de los cambios que se producen en la institución, se realizan habitualmente para periodos cortos, por ejemplo seis meses.", d: "Son un tipo especial de plan que establece la distribución de los recursos económicos." },
+                answer: "d"
+            },
+            {
+                question: "14. Un modelo adaptativo matricial de estructura organizativa:",
+                options: { a: "Se presenta en en estructuras informales", b: "No puede representarse en un organigrama.", c: "Es aquel en el que las relaciones no están bien delineadas.", d: "Responde mejor a situaciones de cambio en las instituciones." },
+                answer: "d"
+            },
+            {
+                question: "15. Un organigrama",
+                options: { a: "Es la descripción gráfica de las diferentes actividades de la organización", b: "Representa gráficamente la situación de las diferentes divisiones organizativas de una institución", c: "Permite representar gráficamente a cada uno de los trabajadores de una empresa.", d: "Sólo puede utilizarse en empresas que tienen una estructura jerárquica." },
+                answer: "b"
+            },
+            {
+                question: "16. Se afirma que la reducción de los riesgos en salud y la mortalidad está relacionados en primer lugar con",
+                options: { a: "La biología humana, incluidos los errores genético", b: "El medio ambiente y sus alteraciones", c: "Los estilos de vida", d: "El adecuado funcionamiento de los servicios sanitarios" },
+                answer: "c"
+            },
+            {
+                question: "17. En recientes estadísticas se ha comprobado que en el gasto que se emplea directa o indirectamente en mejorar la salud individual y colectiva ocupa el primer lugar",
+                options: { a: "La biología humana incluida la investigación genética", b: "El medio ambiente y sus alteraciones", c: "La modificación de los estilos de vida", d: "El adecuado funcionamiento de los servicios sanitarios" },
+                answer: "d"
+            },
+            {
+                question: "18. Referida al concepto de mapa sanitario ¿Cuál de estas afirmaciones es falsa?",
+                options: { a: "Se estructura en áreas sanitarias", b: "Sirve para definir el tipo de sistema sanitario", c: "Puede representar tanto la situación actual como la que sería deseable en el futuro", d: "Especifica claramente cuestiones tales como la base humana, los equipamientos, la accesibilidad..." },
+                answer: "b"
+            },
+            {
+                question: "19. La zona Básica de Salud, tal como se define en la Ley general de Sanidad",
+                options: { a: "Es el marco territorial de atención primaria de salud", b: "Ofrece atención primaria y especializada, dependiendo del número de población atendida", c: "Tiene diferentes definiciones, según sea urbana o rural", d: "Como otras muchas cuestiones sanitarias, tiene una regulación marcada por la Unión Europea" },
+                answer: "a"
+            },
+            {
+                question: "20. ¿Cuál de estas afirmaciones no es característica de la planificación?",
+                options: { a: "Tiene estrecha relación con la situación social y económica", b: "No siempre son achacables los resultados a las acciones, dada la gran complejidad de las situaciones posibles", c: "Se basa en el manejo de una información adecuada", d: "Es un proceso que concierne al futuro, en el que puede participar un equipo multidisciplinario" },
+                answer: "b"
+            },
+            {
+                question: "21. La planificación en salud",
+                options: { a: "Se lleva solo a cabo en los niveles de la administración estatal o económica", b: "Parten del conocimiento profundo de los problemas y necesidades de la población", c: "Tienen como objetivo la optimización de los recursos y la consiguiente disminución de costo", d: "Por su especificidad, tienen principios diferentes de la que se lleva a cabo en otros sectores productivos" },
+                answer: "b"
+            },
+            {
+                question: "22. Un necesidad en salud es",
+                options: { a: "La cuantificación estadística de un problema", b: "La definición de un riesgo potencial o real, presente en una población", c: "La desviación entre el estado óptimo de salud, según normas conocidas y estado real", d: "El estado deficiente de salud, en opinión de los expertos" },
+                answer: "c"
+            },
+            {
+                question: "23. Un plan a largo plazo",
+                options: { a: "Correspondo a un tipo de planificación estratégica", b: "No se formula en el área de atención a la salud, dada la dificultad de prever situaciones a más de uno o dos años", c: "Debe especificar detalladamente el calendario pormenorizado de actividades", d: "Es el que se desarrolla a no más de tres años de plazo" },
+                answer: "a"
+            },
+            {
+                question: "24. Para analizar una situación de salud",
+                options: { a: "Tenemos que partir de diagnósticos existentes", b: "Recurriremos exclusivamente a información precedente de fuentes sanitarias fiables", c: "No es necesario conocer todas las alternativas posibles de actuación", d: "Buscamos todos los datos que tengan relación con la situación real y la deseada" },
+                answer: "d"
+            },
+            {
+                question: "25. Jerarquizar las prioridades en un plan",
+                options: { a: "Depende de la cantidad de posibilidades de acción que se dispongan", b: "Es una actividad que se realiza después de conocer los objetivos que se hayan establecido", c: "Es la fase más importante de la planificación", d: "Esta en relación con los factores tales como la magnitud, la trascendencia, así como la vulnerabilidad y el coste" },
+                answer: "d"
+            },
+            {
+                question: "26. Se define la organización como la forma de estructurar y coordinar...",
+                options: { a: "Personal, procedimiento y relaciones", b: "El personal y los recursos materiales con los objetivos", c: "Los recursos materiales y los humanos a través de la departamentalización", d: "Las nomas y los procedimientos con los recursos humanos materiales y financieros" },
+                answer: "b"
+            },
+            {
+                question: "27. Se define el rol en una organización como",
+                options: { a: "La responsabilidad conferida a un puesto", b: "La consideración que se tiene a un determinado nivel", c: "La autoridad que se otorga a los puestos", d: "Los comportamientos y actitudes esperados en un puesto" },
+                answer: "d"
+            },
+            {
+                question: "28. La departamentalización",
+                options: { a: "Es la distribución de los diferentes servicios de un hospital o centro", b: "Tiene como fin la sintomatización en el trabajo", c: "Es la agrupación de los trabajadores en función de similares debilidades y actitudes", d: "De acuerdo a las más modernas teorías administrativas, es una práctica en deshuso" },
+                answer: "b"
+            },
+            {
+                question: "29. Se denomina liderazgo",
+                options: { a: "La capacidad de influenciar en los demás miembros de equipo", b: "La posibilidad de dictar órdenes que sean ajustadas al cumplimiento de los objetivos", c: "La habilidad para incentivar a las personas que trabajan en el equipo", d: "Las cualidades personales que hacen que una persona sobrasalga entre los demás" },
+                answer: "a"
+            },
+            {
+                question: "30. La motivación",
+                options: { a: "Es una situación que se obliga a las personas a trabajar de una forma determinada", b: "Funciona mejor si se trata de atender las necesidades básicas de los individuos", c: "Es muy utilizada como elemento directivo por los sistemas autocráticos de trabajo", d: "Es la presentación de estímulos para el trabajo" },
+                answer: "d"
+            },
+            {
+                question: "31. En un servicio de enfermería, la motivación se basa generalmente en (falsa)",
+                options: { a: "Salario y la posibilidad de incremento de éste", b: "Es establecimiento de turnos adecuados", c: "La posibilidad de alcanzar puestos de responsabilidad", d: "La promoción permanente y el reconocimiento de la labor" },
+                answer: "a"
+            },
+            {
+                question: "32. En una unidad de enfermería, la supervisora tiene como principal misión",
+                options: { a: "La orientación de los horarios, peticiones de material y confeccion de turnos", b: "El cumplimiento de las órdenes que recibe de la dirección de enfermería", c: "La enseñanza y la observación de las actividades del personal y su orientación", d: "La vigilancia del cumplimiento de la normativa por parte de las enfermeras y auxiliares" },
+                answer: "c"
+            },
+            {
+                question: "33. El control de calidad",
+                options: { a: "El producto de la investigación de un servicio de salud", b: "La medición del rendimiento de la atención sanitaria", c: "La comparación de una situación obtenida con el objetivo fijado", d: "Medida de una característica, de acuerdo con los más elevados niveles preestablecidos" },
+                answer: "d"
+            },
+            {
+                question: "34. El concepto de garantía de la calidad asistencial",
+                options: { a: "Tiene que ver fundamentalmente con los actuales sistemas de seguros sanitarios", b: "Es un compromiso de atención por parte del sistema y sus trabajadores hacia los usuarios", c: "Se basa en ofrecer los mejores medios tecnológicos de atención sanitaria", d: "Se puede aplicar solamente en el medio hospitalario" },
+                answer: "b"
+            },
+            {
+                question: "35. Una norma de acreditación",
+                options: { a: "Es una formula para medir la calidad de un determinado centro, de acuerdo con sus resultados", b: "Es una guía de comparación referida fundamentalmente a la estructura", c: "Sirve para determinar la utilidad de los procedimientos empleados", d: "Es la base fundamental de la evaluación personal" },
+                answer: "b"
+            },
+            {
+                question: "36. El análisis de calidad por proceso sirve para",
+                options: { a: "Observar directamente como se lleva a cabo la actividad", b: "Seleccionar los procedimientos más complejos de entre los que se llevan a cabo en una institución", c: "Establecer un sistema de medida de afectividad", d: "Valorar la corrección y utilidad de un procedimiento determinado" },
+                answer: "d"
+            },
+            {
+                question: "37. Un protocolo, señala la falsa",
+                options: { a: "Describe las condiciones de ejecución de una actividad determinada", b: "ayuda a abaratar los costes", c: "Facilita la transmisión de información", d: "Contribuye a la estabilidad de la institución, ya que bien formulado tiene una vigencia permanente." },
+                answer: "d"
+            },
+            {
+                question: "38. La sistematización de las actividades:",
+                options: { a: "Responde principalmente a criterios económicos", b: "Partiendo de estudios teóricos trata siempre de plantear sistemas ideales de trabajo", c: "Puede reflejar tanto la práctica ideal como la que más habitualmente se lleva a cabo en la institución", d: "Se realiza por el equipo directivo, para que pueda ser más fácilmente definida por toda la institución." },
+                answer: "c"
+            },
+            {
+                question: "39. Un puesto de trabajo",
+                options: { a: "La situación de una determinada función dentro de la organización", b: "La definición de las responsabilidades relaciones y condiciones de un lugar laboral concreto", c: "El lugar donde se produce la actividad asistencial", d: "Cualquiera de las afirmaciones anteriores es verdad." },
+                answer: "b"
+            },
+            {
+                question: "40. En una empresa sanitaria, la comunicación",
+                options: { a: "Puede ser más productiva cuanto más pequeño sean los grupos", b: "Siguen los mismos principios que en otras empresas de distinta finalidad", c: "Es preferible en escrito", d: "Tiene unos canales especiales" },
+                answer: "b"
+            },
+            {
+                question: "41. En el proceso administrativo el control:",
+                options: { a: "Se aplica excesivamente en la fase final", b: "Tiene lugar en los más altos niveles de organización", c: "Tiene como fin la mejora constante del proceso", d: "Supone siempre la adopción de medidas correctoras." },
+                answer: "c"
+            },
+            {
+                question: "42. La auditoría",
+                options: { a: "Es un medio de control utilizado principalmente en la gestion del personal", b: "Es una forma de control indirecto", c: "se realiza por comité interno", d: "Se apoya en la observación y la supervisión directa" },
+                answer: "b"
+            },
+            {
+                question: "43. Al recibir más que los cuidados de enfermería son un servicio público como nos basamos en:",
+                options: { a: "la circunstancia de que la mayoría de las enfermeras trabajan en el sector público de la salud.", b: "La historia de la enfermería que muestra a las enfermeras como trabajadoras vocacionales y desinteresadas.", c: "El concepto actual de salud, que lo considera como un bien general.", d: "Las características de la salud, de las instituciones sanitarias y de la formación de las enfermeras." },
+                answer: "d"
+            },
+            {
+                question: "44. la función administradora de las enfermeras tiene que ver con",
+                options: { a: "La situación de cada una en un puesto de responsabilidad.", b: "Algunas de sus actividades, claramente delimitadas.", c: "La utilización que la enfermera puede hacer de los principios administrativos para la actuación sistemática, eficaz y eficiente.", d: "El manejo de los principales económicos aplicados a los servicios de enfermería" },
+                answer: "c"
+            },
+            {
+                question: "45. En Enfermería el modelo teórico es",
+                options: { a: "Es una orientación filosófica de los cuidados enfermeros, utilizada fundamentalmente en la enseñanza.", b: "Tiene que ver principalmente con la función investigadora de la enfermera.", c: "Ayuda a orientar la acción enfermera en todos los aspectos.", d: "Se enfoca principalmente a definir los objetivos de las actividades de cuidados." },
+                answer: "c"
+            },
+            {
+                question: "46. La utilización de sistema de clasificación y denominación en los cuidados de enfermería",
+                options: { a: "Facilita la transmisión y utilización de la información generada por las enfermeras propiciando un lenguaje comun", b: "tiene como finalidad principal etiquetar las actividades enfermeras.", c: "Se encamina fundamentalmente a la identificación de los problemas de cuidados.", d: "Es un trabajo inminente teórico, que apoyará a las bases filosóficas de la profesión" },
+                answer: "a"
+            },
+            {
+                question: "47. El producto sanitario.",
+                options: { a: "Debe ser definido por la Entidad Gestora.", b: "constituye la orientación principal del marketing sanitario ya que todo gira alrededor de él.", c: "Presenta diferencia con otros productos fundamentalmente en relación a su coste.", d: "debe identificarse siempre en su función del cliente" },
+                answer: "d"
+            },
+            {
+                question: "48. Delegar actividades:",
+                options: { a: "Es confiar toda la responsabilidad en la persona en la que se delega.", b: "Es una actividad que un directivo responsable no realiza jamás, por los riesgos que puede suponer para un trabajo bien hecho.", c: "Significa la asignación de tareas sobre las que se ejerce autoridad.", d: "Es una situación que normalmente está prevista en las normas de cada institución y en los planes y programas." },
+                answer: "c"
+            },
+            {
+                question: "49. Se atribuye históricamente el comienzo del estudio sobre las medidas de funcionamiento de los servicios sanitarios a:",
+                options: { a: "Nightingale", b: "Chogton", c: "Weber", d: "Donabodian" },
+                answer: "a"
+            },
+            {
+                question: "50. Para ofrecerte un modelo adaptativo matricial de estructura organizativa",
+                options: { a: "Se presenta en las estructuras informales.", b: "No puede representarse en un organigrama.", c: "Es aquel en el que las relaciones no están bien delineadas.", d: "Responde mejor a situaciones de cambio en la institución" },
+                answer: "d"
+            }
+        ];
+
+        const quizContainer = document.getElementById('quiz-container');
+        const nextButton = document.getElementById('next-btn');
+        const restartButton = document.getElementById('restart-btn');
+        const correctScoreElem = document.getElementById('correct-score');
+        const incorrectScoreElem = document.getElementById('incorrect-score');
+
+        let currentQuestionIndex = 0;
+        let correctCount = 0;
+        let incorrectCount = 0;
+
+        function startQuiz() {
+            currentQuestionIndex = 0;
+            correctCount = 0;
+            incorrectCount = 0;
+            updateScoreboard();
+            showQuestion();
+            nextButton.classList.add('hidden');
+            restartButton.classList.add('hidden');
+        }
+        
+        function showQuestion() {
+            quizContainer.innerHTML = '';
+            nextButton.classList.add('hidden');
+
+            if (currentQuestionIndex >= quizData.length) {
+                showFinalResults();
+                return;
+            }
+
+            const item = quizData[currentQuestionIndex];
+            let questionHTML = `
+                <div class="bg-gray-700 shadow-md rounded-lg p-6 question-card">
+                    <p class="font-semibold text-lg mb-4">${item.question}</p>
+                    <div class="space-y-3 options-container">
+            `;
+            for(const key in item.options) {
+                questionHTML += `
+                    <label data-key="${key}" class="option-label flex items-center p-3 rounded-lg border border-gray-600 hover:bg-gray-600 transition cursor-pointer">
+                        <span class="ml-3 text-gray-300">${key.toUpperCase()}. ${item.options[key]}</span>
+                    </label>
+                `;
+            }
+            questionHTML += `</div></div>`;
+            quizContainer.innerHTML = questionHTML;
+
+            const options = quizContainer.querySelectorAll('.option-label');
+            options.forEach(option => {
+                option.addEventListener('click', handleOptionSelect);
+            });
+        }
+
+        function handleOptionSelect(event) {
+            const selectedLabel = event.currentTarget;
+            const userAnswer = selectedLabel.dataset.key;
+            const correctAnswer = quizData[currentQuestionIndex].answer;
+            const optionsContainer = selectedLabel.parentElement;
+
+            optionsContainer.querySelectorAll('.option-label').forEach(label => {
+                label.classList.add('disabled');
+            });
+
+            const correctLabel = optionsContainer.querySelector(`label[data-key="${correctAnswer}"]`);
+
+            if (userAnswer === correctAnswer) {
+                correctCount++;
+                selectedLabel.classList.remove('border-gray-600', 'hover:bg-gray-600');
+                selectedLabel.classList.add('bg-green-500/20', 'border-green-500');
+            } else {
+                incorrectCount++;
+                selectedLabel.classList.remove('border-gray-600', 'hover:bg-gray-600');
+                selectedLabel.classList.add('bg-red-500/20', 'border-red-500');
+                if (correctLabel) {
+                    correctLabel.classList.remove('border-gray-600', 'hover:bg-gray-600');
+                    correctLabel.classList.add('bg-green-500/20', 'border-green-500');
+                }
+            }
+
+            updateScoreboard();
+            nextButton.classList.remove('hidden');
+        }
+        
+        function showFinalResults() {
+            quizContainer.innerHTML = `
+                <div class="bg-gray-700 shadow-md rounded-lg p-6 text-center">
+                    <h2 class="text-2xl font-bold mb-4 text-teal-400">¡Test Completado!</h2>
+                    <p class="text-lg text-gray-300">Has finalizado el cuestionario.</p>
+                </div>
+            `;
+            nextButton.classList.add('hidden');
+            restartButton.classList.remove('hidden');
+        }
+
+        function updateScoreboard() {
+            correctScoreElem.textContent = correctCount;
+            incorrectScoreElem.textContent = incorrectCount;
+        }
+
+        nextButton.addEventListener('click', () => {
+            currentQuestionIndex++;
+            showQuestion();
+        });
+
+        restartButton.addEventListener('click', startQuiz);
+
+        // Initial start
+        startQuiz();
+    </script>
+</body>
+</html>
